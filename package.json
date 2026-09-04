@@ -1,0 +1,11 @@
+{
+  "name": "photobox-kuis-gombal",
+  "version": "1.0.0",
+  "description": "Photobox Floral & Kuis Gombal Bikin Salting",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
