@@ -5,6 +5,31 @@ import confetti from 'canvas-confetti';
 import { sfx } from '@/lib/soundEffects';
 import { TEMA_CONFIG } from '@/lib/constants';
 
+// ─── PHOTO FILTERS ────────────────────────────────────────────────────────────
+const PHOTO_FILTERS = [
+  { id: 'none',       label: 'Normal',    css: 'none' },
+  { id: 'warm',       label: '🌅 Warm',   css: 'sepia(0.35) saturate(1.4) brightness(1.05)' },
+  { id: 'cool',       label: '❄️ Cool',   css: 'hue-rotate(20deg) saturate(1.2) brightness(1.05)' },
+  { id: 'vintage',    label: '📷 Vintage', css: 'sepia(0.55) contrast(0.85) brightness(0.92)' },
+  { id: 'vivid',      label: '🌈 Vivid',  css: 'saturate(1.8) contrast(1.15)' },
+  { id: 'bw',         label: '🖤 B&W',    css: 'grayscale(1) contrast(1.1)' },
+  { id: 'fade',       label: '🌫️ Fade',   css: 'saturate(0.7) brightness(1.1) contrast(0.85)' },
+  { id: 'rose',       label: '🌹 Rose',   css: 'sepia(0.3) saturate(1.5) hue-rotate(-20deg)' },
+];
+
+// ─── CSS FILTER STRING → Canvas ImageData manipulation approximation ──────────
+// We pre-render filter in a temp canvas using CSS then draw to main canvas
+function applyFilterToCanvas(srcImg, filterCss) {
+  const tmp = document.createElement('canvas');
+  tmp.width = srcImg.width || srcImg.naturalWidth || 800;
+  tmp.height = srcImg.height || srcImg.naturalHeight || 800;
+  const tmpCtx = tmp.getContext('2d');
+  tmpCtx.filter = filterCss === 'none' ? 'none' : filterCss;
+  tmpCtx.drawImage(srcImg, 0, 0, tmp.width, tmp.height);
+  tmpCtx.filter = 'none';
+  return tmp;
+}
+
 export default function StepFinalPhotobox({
   namaUser,
   photos,
@@ -13,6 +38,20 @@ export default function StepFinalPhotobox({
   onRestart,
 }) {
   const [activeThemeId, setActiveThemeId] = useState(defaultTheme);
+  const [activeFilter, setActiveFilter] = useState('none');
+  const [customText, setCustomText] = useState('');
+  const [customDate, setCustomDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [showCustomPanel, setShowCustomPanel] = useState(false);
+
+  // Per-photo adjustments: zoom (scale) and position offsets (%)
+  const [photoAdj, setPhotoAdj] = useState([
+    { zoom: 1, x: 0, y: 0 },
+    { zoom: 1, x: 0, y: 0 },
+    { zoom: 1, x: 0, y: 0 },
+    { zoom: 1, x: 0, y: 0 },
+  ]);
+  const [selectedPhoto, setSelectedPhoto] = useState(0); // which photo is being adjusted
+
   const canvasRef = useRef(null);
   const loadedImgsRef = useRef(null);
 
@@ -28,7 +67,7 @@ export default function StepFinalPhotobox({
     } catch (e) {}
   }, []);
 
-  // --- DRAWING HELPERS ---
+  // ─── DRAWING HELPERS ────────────────────────────────────────────────────────
   const drawRoundedRect = (ctx, x, y, w, h, radius) => {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
@@ -49,7 +88,6 @@ export default function StepFinalPhotobox({
     ctx.arc(cx - size * 0.18, cy + size * 0.15, size * 0.25, 0, Math.PI * 2);
     ctx.arc(cx + size * 0.18, cy + size * 0.15, size * 0.25, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.fillStyle = 'rgba(2, 132, 199, 0.12)';
     ctx.beginPath();
     ctx.arc(cx, cy + size * 0.12, size * 0.35, 0.2, Math.PI - 0.2);
@@ -62,7 +100,6 @@ export default function StepFinalPhotobox({
     ctx.fillStyle = '#f59e0b';
     ctx.strokeStyle = '#d97706';
     ctx.lineWidth = 2.5;
-
     const points = 5;
     ctx.beginPath();
     for (let i = 0; i < points * 2; i++) {
@@ -76,18 +113,6 @@ export default function StepFinalPhotobox({
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
-
-    ctx.fillStyle = '#fbbf24';
-    for (let i = 0; i < points; i++) {
-      const angle = (i * 2 * Math.PI) / points - Math.PI / 2;
-      const x = cx + Math.cos(angle) * r;
-      const y = cy + Math.sin(angle) * r;
-      ctx.beginPath();
-      ctx.arc(x, y, r * 0.22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    }
-
     ctx.fillStyle = '#b45309';
     ctx.beginPath();
     ctx.arc(cx, cy, r * 0.28, 0, Math.PI * 2);
@@ -115,22 +140,18 @@ export default function StepFinalPhotobox({
     ctx.moveTo(cx, cy - size * 0.45);
     ctx.lineTo(cx, cy - size * 0.9);
     ctx.stroke();
-
     ctx.fillStyle = '#86efac';
     ctx.beginPath();
     ctx.arc(cx, cy - size * 0.9, size * 0.16, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.fillStyle = '#4ade80';
     ctx.beginPath();
     ctx.ellipse(cx, cy - size * 0.2, size * 0.7, size * 0.45, 0, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.beginPath();
     ctx.ellipse(cx - size * 0.7, cy - size * 0.2, size * 0.25, size * 0.12, -Math.PI / 6, 0, Math.PI * 2);
     ctx.ellipse(cx + size * 0.7, cy - size * 0.2, size * 0.25, size * 0.12, Math.PI / 6, 0, Math.PI * 2);
     ctx.fill();
-
     const eyePositions = [-size * 0.32, 0, size * 0.32];
     eyePositions.forEach((ox) => {
       ctx.fillStyle = '#ffffff';
@@ -140,19 +161,16 @@ export default function StepFinalPhotobox({
       ctx.strokeStyle = '#166534';
       ctx.lineWidth = 1.5;
       ctx.stroke();
-
       ctx.fillStyle = '#1e1b4b';
       ctx.beginPath();
       ctx.arc(cx + ox, cy - size * 0.28, size * 0.08, 0, Math.PI * 2);
       ctx.fill();
     });
-
     ctx.strokeStyle = '#15803d';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(cx, cy - size * 0.05, size * 0.22, 0.2, Math.PI - 0.2);
     ctx.stroke();
-
     ctx.restore();
   };
 
@@ -164,7 +182,6 @@ export default function StepFinalPhotobox({
     ctx.bezierCurveTo(cx - size * 0.55, cy - size * 0.35, cx - size * 0.6, cy + size * 0.2, cx, cy + size * 0.6);
     ctx.bezierCurveTo(cx + size * 0.6, cy + size * 0.2, cx + size * 0.55, cy - size * 0.35, cx, cy - size * 0.35);
     ctx.fill();
-
     ctx.fillStyle = '#fef08a';
     for (let row = -1; row <= 1; row++) {
       for (let col = -1; col <= 1; col++) {
@@ -173,7 +190,6 @@ export default function StepFinalPhotobox({
         ctx.fill();
       }
     }
-
     ctx.fillStyle = '#4ade80';
     for (let i = -2; i <= 2; i++) {
       ctx.beginPath();
@@ -189,16 +205,8 @@ export default function StepFinalPhotobox({
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.fillStyle = '#2563eb';
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, -0.4, 0.4);
-    ctx.arc(cx, cy, r, Math.PI - 0.4, Math.PI + 0.4);
-    ctx.fill();
-
     ctx.fillStyle = '#2563eb';
     ctx.fillRect(cx - r, cy - r * 0.32, r * 2, r * 0.64);
-
     ctx.fillStyle = '#dc2626';
     const starPoints = 5;
     ctx.beginPath();
@@ -242,24 +250,19 @@ export default function StepFinalPhotobox({
 
   const drawAestheticBarcode = (ctx, x, y, w, h, color) => {
     ctx.fillStyle = color;
-    const barPattern = [
-      3, 1, 2, 4, 1, 3, 2, 1, 4, 2, 1, 3, 1, 2, 4, 1, 2, 3, 4, 1,
-      2, 3, 1, 4, 2, 1, 3, 2, 4, 1, 3, 1, 2, 4, 2, 1, 3, 1, 2, 4,
-    ];
+    const barPattern = [3,1,2,4,1,3,2,1,4,2,1,3,1,2,4,1,2,3,4,1,2,3,1,4,2,1,3,2,4,1,3,1,2,4,2,1,3,1,2,4];
     let currentX = x;
     const totalUnits = barPattern.reduce((a, b) => a + b, 0);
     const unitWidth = w / totalUnits;
-
     barPattern.forEach((barWidth, index) => {
-      if (index % 2 === 0) {
-        ctx.fillRect(currentX, y, barWidth * unitWidth, h);
-      }
+      if (index % 2 === 0) ctx.fillRect(currentX, y, barWidth * unitWidth, h);
       currentX += barWidth * unitWidth;
     });
   };
 
+  // ─── MAIN RENDER ─────────────────────────────────────────────────────────────
   const renderCanvas = useCallback(
-    (themeKey, imgs) => {
+    (themeKey, imgs, adj, filterCss, txtOverride, dateOverride) => {
       const canvas = canvasRef.current;
       if (!canvas || !imgs || imgs.length < 4) return;
 
@@ -278,7 +281,7 @@ export default function StepFinalPhotobox({
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Background Pattern Spesifik Tiap Tema
+      // 2. Background Pattern
       if (theme.themeType === 'andys_room') {
         for (let row = 0; row < 14; row++) {
           const y = 80 + row * 135;
@@ -292,16 +295,10 @@ export default function StepFinalPhotobox({
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.18)';
         ctx.lineWidth = 1.5;
         for (let x = 0; x < width; x += 28) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
         }
         for (let y = 0; y < height; y += 28) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
         }
         drawCowhideSpot(ctx, 30, 200, 24, 18, 0.4);
         drawCowhideSpot(ctx, width - 28, 480, 28, 20, -0.3);
@@ -312,9 +309,7 @@ export default function StepFinalPhotobox({
           const px = (i * 97) % width;
           const py = (i * 131) % height;
           ctx.fillStyle = i % 2 === 0 ? 'rgba(34, 197, 94, 0.25)' : 'rgba(168, 85, 247, 0.22)';
-          ctx.beginPath();
-          ctx.arc(px, py, 2.5 + (i % 3), 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(px, py, 2.5 + (i % 3), 0, Math.PI * 2); ctx.fill();
         }
       } else if (theme.themeType === 'alien') {
         for (let i = 0; i < 50; i++) {
@@ -322,9 +317,7 @@ export default function StepFinalPhotobox({
           const py = (i * 127) % height;
           ctx.fillStyle = i % 3 === 0 ? '#4ade80' : '#ffffff';
           ctx.globalAlpha = 0.4 + (i % 4) * 0.15;
-          ctx.beginPath();
-          ctx.arc(px, py, 1.8 + (i % 2), 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(px, py, 1.8 + (i % 2), 0, Math.PI * 2); ctx.fill();
           ctx.globalAlpha = 1.0;
         }
       } else if (theme.themeType === 'lotso') {
@@ -335,24 +328,23 @@ export default function StepFinalPhotobox({
         }
       }
 
-      // 3. Border Luar & Dalam Kartun Gemas
+      // 3. Border
       ctx.strokeStyle = theme.borderOuter;
       ctx.lineWidth = 10;
       drawRoundedRect(ctx, 16, 16, width - 32, height - 32, 28);
       ctx.stroke();
-
       ctx.strokeStyle = theme.borderInner;
       ctx.lineWidth = 3.5;
       drawRoundedRect(ctx, 25, 25, width - 50, height - 50, 22);
       ctx.stroke();
 
-      // 4. Ornamen 4 Sudut
+      // 4. Corner ornaments
       drawToyStoryCornerDecor(ctx, 45, 45, theme);
       drawToyStoryCornerDecor(ctx, width - 45, 45, theme);
       drawToyStoryCornerDecor(ctx, 45, height - 45, theme);
       drawToyStoryCornerDecor(ctx, width - 45, height - 45, theme);
 
-      // 5. Washi Tape Selotip Lucu di Atas
+      // 5. Washi tape
       ctx.fillStyle = theme.washiColor;
       ctx.fillRect(width / 2 - 80, 8, 160, 24);
       ctx.strokeStyle = 'rgba(0,0,0,0.12)';
@@ -360,45 +352,41 @@ export default function StepFinalPhotobox({
       ctx.setLineDash([4, 4]);
       ctx.strokeRect(width / 2 - 80, 8, 160, 24);
       ctx.setLineDash([]);
-
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('⭐  🚀  🧸  🤠  ⭐', width / 2, 25);
 
-      // 6. Badge Header Kartun Toy Story
+      // 6. Header badge
       ctx.fillStyle = theme.tagBg;
       drawRoundedRect(ctx, width / 2 - 135, 46, 270, 32, 16);
       ctx.fill();
       ctx.strokeStyle = theme.borderOuter;
       ctx.lineWidth = 1.5;
       ctx.stroke();
-
       ctx.fillStyle = theme.tagText;
       ctx.font = 'bold 13px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('🧸 TOY STORY PHOTOBOX ARCADE 🧸', width / 2, 67);
 
-      // Judul Utama Tema
       ctx.fillStyle = theme.textColor;
       ctx.font = 'bold 27px sans-serif';
       ctx.fillText(theme.title, width / 2, 108);
-
-      // Cetak Gelar Resmi dari Mesin Gacha Toy Story
       ctx.font = 'bold 13.5px sans-serif';
       ctx.fillStyle = theme.primaryAccent;
       ctx.fillText(`✦ ${gelarUser || 'SPACE RANGER TERBAIK SE-GALAKSI'} ✦`, width / 2, 134);
 
-      // 7. Render 4 Foto Polaroid Strip
+      // 7. Photos with per-photo zoom & position
       const slotWidth = width - 96;
       const slotHeight = 310;
       const startY = 160;
       const gap = 34;
 
       imgs.forEach((img, idx) => {
+        const a = adj[idx] || { zoom: 1, x: 0, y: 0 };
         const y = startY + idx * (slotHeight + gap);
         const x = 48;
 
-        // Kartu Putih Polaroid
+        // Polaroid card shadow
         ctx.save();
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
@@ -408,37 +396,39 @@ export default function StepFinalPhotobox({
         ctx.fill();
         ctx.restore();
 
-        // Gambar Foto di dalam Frame
+        // Clip & draw photo with filter + custom offset/zoom
         ctx.save();
         drawRoundedRect(ctx, x + 6, y + 6, slotWidth - 12, slotHeight - 12, 14);
         ctx.clip();
 
+        const filteredSrc = applyFilterToCanvas(img, filterCss);
         const imgAspect = img.width / img.height;
         const slotAspect = (slotWidth - 12) / (slotHeight - 12);
-        let renderW, renderH, renderX, renderY;
-
+        let baseW, baseH;
         if (imgAspect > slotAspect) {
-          renderH = slotHeight - 12;
-          renderW = renderH * imgAspect;
-          renderX = x + 6 + (slotWidth - 12 - renderW) / 2;
-          renderY = y + 6;
+          baseH = slotHeight - 12;
+          baseW = baseH * imgAspect;
         } else {
-          renderW = slotWidth - 12;
-          renderH = renderW / imgAspect;
-          renderX = x + 6;
-          renderY = y + 6 + (slotHeight - 12 - renderH) / 2;
+          baseW = slotWidth - 12;
+          baseH = baseW / imgAspect;
         }
+        // Apply zoom
+        const rW = baseW * a.zoom;
+        const rH = baseH * a.zoom;
+        // Center + offset (a.x, a.y are % of base size)
+        const rX = x + 6 + (slotWidth - 12 - rW) / 2 + (a.x / 100) * baseW;
+        const rY = y + 6 + (slotHeight - 12 - rH) / 2 + (a.y / 100) * baseH;
 
-        ctx.drawImage(img, renderX, renderY, renderW, renderH);
+        ctx.drawImage(filteredSrc, rX, rY, rW, rH);
         ctx.restore();
 
-        // Border Polaroid
+        // Polaroid border
         ctx.strokeStyle = theme.borderInner;
         ctx.lineWidth = 3;
         drawRoundedRect(ctx, x + 6, y + 6, slotWidth - 12, slotHeight - 12, 14);
         ctx.stroke();
 
-        // Badge Nomor & Ikon Pose Toy Story
+        // Badge number
         const badgeX = x + 18;
         const badgeY = y + 18;
         ctx.fillStyle = theme.tagBg;
@@ -447,71 +437,74 @@ export default function StepFinalPhotobox({
         drawRoundedRect(ctx, badgeX, badgeY, 78, 28, 14);
         ctx.fill();
         ctx.shadowBlur = 0;
-
         ctx.strokeStyle = theme.borderOuter;
         ctx.lineWidth = 1.5;
         ctx.stroke();
-
         ctx.fillStyle = theme.tagText;
         ctx.font = 'bold 13px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`0${idx + 1} ${theme.badgeIcons[idx] || '🧸'}`, badgeX + 39, badgeY + 19);
 
-        // Hiasan Ornamen Kartun di Sudut Foto
-        if (theme.themeType === 'andys_room') {
-          drawToyStoryCloud(ctx, x + slotWidth - 30, y + 20, 36);
-        } else if (theme.themeType === 'woody') {
-          drawSheriffStar(ctx, x + slotWidth - 26, y + 22, 14);
-        } else if (theme.themeType === 'buzz') {
-          drawLuxoBall(ctx, x + slotWidth - 26, y + 22, 14);
-        } else if (theme.themeType === 'alien') {
-          drawToyAlien(ctx, x + slotWidth - 26, y + 26, 16);
-        } else if (theme.themeType === 'lotso') {
-          drawCartoonStrawberry(ctx, x + slotWidth - 26, y + 24, 20);
-        }
+        // Corner decor on each photo
+        if (theme.themeType === 'andys_room') drawToyStoryCloud(ctx, x + slotWidth - 30, y + 20, 36);
+        else if (theme.themeType === 'woody') drawSheriffStar(ctx, x + slotWidth - 26, y + 22, 14);
+        else if (theme.themeType === 'buzz') drawLuxoBall(ctx, x + slotWidth - 26, y + 22, 14);
+        else if (theme.themeType === 'alien') drawToyAlien(ctx, x + slotWidth - 26, y + 26, 16);
+        else if (theme.themeType === 'lotso') drawCartoonStrawberry(ctx, x + slotWidth - 26, y + 24, 20);
       });
 
-      // 8. Footer Strip Photobox
+      // 8. Footer
       const footerY = startY + 4 * (slotHeight + gap) + 10;
-
       drawAndySignature(ctx, width / 2, footerY + 16, theme.textColor);
 
-      const today = new Date();
-      const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '.');
-      const timeStr = today.toTimeString().slice(0, 5);
+      const displayDate = dateOverride ? dateOverride.replace(/-/g, '.') : new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+      const timeStr = new Date().toTimeString().slice(0, 5);
 
       ctx.textAlign = 'center';
       ctx.fillStyle = theme.textColor;
       ctx.font = 'bold 15px monospace';
-      ctx.fillText(`${dateStr} • ${timeStr} WIB ✦ TOY STORY ARCHIVE`, width / 2, footerY + 46);
+      ctx.fillText(`${displayDate} • ${timeStr} WIB ✦ TOY STORY ARCHIVE`, width / 2, footerY + 46);
 
-      ctx.font = 'italic bold 13.5px sans-serif';
-      ctx.fillStyle = theme.primaryAccent;
-      ctx.fillText(theme.quote, width / 2, footerY + 70);
-
-      drawAestheticBarcode(ctx, width / 2 - 120, footerY + 86, 240, 34, theme.textColor);
-
-      ctx.font = '11px monospace';
-      ctx.fillStyle = theme.primaryAccent;
-      ctx.fillText(
-        `NO. TOY-${Math.floor(100000 + Math.random() * 900000)} • OFFICIAL SPECIAL EDITION`,
-        width / 2,
-        footerY + 134
-      );
-
-      ctx.font = '22px sans-serif';
-      ctx.fillText('🤠  🚀  ☁️  🛸  🍓  🧸  ⭐', width / 2, footerY + 164);
+      // Custom text overlay
+      if (txtOverride && txtOverride.trim()) {
+        ctx.font = 'italic bold 16px sans-serif';
+        ctx.fillStyle = theme.primaryAccent;
+        ctx.fillText(`💬 "${txtOverride.trim()}"`, width / 2, footerY + 68);
+        ctx.font = 'italic bold 13.5px sans-serif';
+        ctx.fillStyle = theme.primaryAccent;
+        ctx.fillText(theme.quote, width / 2, footerY + 90);
+        drawAestheticBarcode(ctx, width / 2 - 120, footerY + 106, 240, 34, theme.textColor);
+        ctx.font = '11px monospace';
+        ctx.fillStyle = theme.primaryAccent;
+        ctx.fillText(
+          `NO. TOY-${Math.floor(100000 + Math.random() * 900000)} • OFFICIAL SPECIAL EDITION`,
+          width / 2, footerY + 154
+        );
+        ctx.font = '22px sans-serif';
+        ctx.fillText('🤠  🚀  ☁️  🛸  🍓  🧸  ⭐', width / 2, footerY + 184);
+      } else {
+        ctx.font = 'italic bold 13.5px sans-serif';
+        ctx.fillStyle = theme.primaryAccent;
+        ctx.fillText(theme.quote, width / 2, footerY + 70);
+        drawAestheticBarcode(ctx, width / 2 - 120, footerY + 86, 240, 34, theme.textColor);
+        ctx.font = '11px monospace';
+        ctx.fillStyle = theme.primaryAccent;
+        ctx.fillText(
+          `NO. TOY-${Math.floor(100000 + Math.random() * 900000)} • OFFICIAL SPECIAL EDITION`,
+          width / 2, footerY + 134
+        );
+        ctx.font = '22px sans-serif';
+        ctx.fillText('🤠  🚀  ☁️  🛸  🍓  🧸  ⭐', width / 2, footerY + 164);
+      }
     },
     [gelarUser]
   );
 
-  // Load photos into HTML Image objects
+  // Load photos
   useEffect(() => {
     if (!photos || photos.length < 4) return;
-
     let loadedCount = 0;
     const imgObjects = [];
-
     photos.forEach((src, idx) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -521,31 +514,49 @@ export default function StepFinalPhotobox({
         loadedCount++;
         if (loadedCount === 4) {
           loadedImgsRef.current = imgObjects;
-          renderCanvas(activeThemeId, imgObjects);
+          const filter = PHOTO_FILTERS.find((f) => f.id === activeFilter)?.css || 'none';
+          renderCanvas(activeThemeId, imgObjects, photoAdj, filter, customText, customDate);
         }
       };
     });
-  }, [photos, activeThemeId, renderCanvas]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photos]);
+
+  // Re-render whenever settings change
+  useEffect(() => {
+    if (!loadedImgsRef.current) return;
+    const filter = PHOTO_FILTERS.find((f) => f.id === activeFilter)?.css || 'none';
+    renderCanvas(activeThemeId, loadedImgsRef.current, photoAdj, filter, customText, customDate);
+  }, [activeThemeId, activeFilter, photoAdj, customText, customDate, renderCanvas]);
 
   const handleSelectTheme = (themeId) => {
     sfx.playPop();
     setActiveThemeId(themeId);
-    if (loadedImgsRef.current) {
-      renderCanvas(themeId, loadedImgsRef.current);
-    }
   };
 
   const handleDownload = () => {
     sfx.playFanfare();
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const link = document.createElement('a');
     const safeNama = (namaUser || 'player').toLowerCase().replace(/[^a-z0-9]/g, '_');
     link.download = `photobox-toystory-${activeThemeId}-${safeNama}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
+
+  const updateAdj = (idx, key, val) => {
+    setPhotoAdj((prev) => {
+      const next = prev.map((a, i) => (i === idx ? { ...a, [key]: val } : a));
+      return next;
+    });
+  };
+
+  const resetAdj = (idx) => {
+    setPhotoAdj((prev) => prev.map((a, i) => (i === idx ? { zoom: 1, x: 0, y: 0 } : a)));
+  };
+
+  const curAdj = photoAdj[selectedPhoto] || { zoom: 1, x: 0, y: 0 };
 
   return (
     <div className="max-w-lg w-full text-center cute-card p-6 sm:p-8 rounded-3xl relative z-10">
@@ -559,10 +570,10 @@ export default function StepFinalPhotobox({
         TOY STORY PHOTO STRIP 🧸✨
       </h2>
       <p className="text-zinc-500 text-xs sm:text-sm mb-4">
-        Pilih tema kartun Toy Story kesukaanmu di bawah ini & simpan hasilnya!
+        Pilih tema, filter &amp; atur foto sesuai keinginan kamu!
       </p>
 
-      {/* PILIH TEMA FRAME PHOTOBOX TOY STORY */}
+      {/* PILIH TEMA */}
       <div className="mb-4 text-left">
         <label className="block text-xs font-bold text-zinc-600 mb-2 flex items-center gap-1">
           <span>🧸</span> Pilih Desain Kartun Toy Story:
@@ -589,7 +600,149 @@ export default function StepFinalPhotobox({
         </div>
       </div>
 
-      {/* Canvas Pratinjau Photobox */}
+      {/* FILTER FOTO */}
+      <div className="mb-4 text-left">
+        <label className="block text-xs font-bold text-zinc-600 mb-2 flex items-center gap-1">
+          <span>🎨</span> Filter Foto:
+        </label>
+        <div className="flex flex-wrap gap-1.5">
+          {PHOTO_FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => { sfx.playPop(); setActiveFilter(f.id); }}
+              className={`py-1.5 px-3 rounded-xl text-xs font-bold border-2 transition ${
+                activeFilter === f.id
+                  ? 'border-purple-500 bg-purple-100 text-purple-800 ring-1 ring-purple-300'
+                  : 'border-zinc-200 bg-white text-zinc-600 hover:border-purple-300'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* PANEL KUSTOMISASI */}
+      <div className="mb-4 text-left">
+        <button
+          type="button"
+          onClick={() => setShowCustomPanel((v) => !v)}
+          className="w-full py-2 px-4 rounded-xl border-2 border-dashed border-pink-300 text-pink-600 font-bold text-xs hover:bg-pink-50 transition flex items-center justify-between"
+        >
+          <span>✏️ Kustomisasi Foto &amp; Teks</span>
+          <span>{showCustomPanel ? '▲ Tutup' : '▼ Buka'}</span>
+        </button>
+
+        {showCustomPanel && (
+          <div className="mt-3 p-4 bg-pink-50/70 rounded-2xl border-2 border-pink-200 space-y-4">
+
+            {/* Custom Text */}
+            <div>
+              <label className="block text-[11px] font-bold text-zinc-500 mb-1">💬 Teks Kustom (ditampilkan di footer):</label>
+              <input
+                type="text"
+                value={customText}
+                onChange={(e) => setCustomText(e.target.value)}
+                placeholder="Contoh: Senyummu bikin hari ku cerah ✨"
+                maxLength={60}
+                className="w-full text-xs border-2 border-pink-200 rounded-xl px-3 py-2 focus:outline-none focus:border-pink-400 bg-white text-zinc-800"
+              />
+            </div>
+
+            {/* Custom Date */}
+            <div>
+              <label className="block text-[11px] font-bold text-zinc-500 mb-1">📅 Tanggal Cetak:</label>
+              <input
+                type="date"
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+                className="w-full text-xs border-2 border-pink-200 rounded-xl px-3 py-2 focus:outline-none focus:border-pink-400 bg-white text-zinc-800"
+              />
+            </div>
+
+            {/* Per-photo zoom & offset */}
+            <div>
+              <label className="block text-[11px] font-bold text-zinc-500 mb-2">📸 Atur Posisi &amp; Zoom Foto:</label>
+
+              {/* Selector for which photo to adjust */}
+              <div className="flex gap-1.5 mb-3">
+                {[0, 1, 2, 3].map((i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedPhoto(i)}
+                    className={`flex-1 py-1 rounded-lg text-[11px] font-bold border-2 transition ${
+                      selectedPhoto === i
+                        ? 'border-sky-500 bg-sky-100 text-sky-800'
+                        : 'border-zinc-200 bg-white text-zinc-600 hover:border-sky-300'
+                    }`}
+                  >
+                    Pose {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              {/* Zoom slider */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-bold text-zinc-500 w-16">🔍 Zoom</span>
+                  <input
+                    type="range"
+                    min="0.7"
+                    max="2.5"
+                    step="0.05"
+                    value={curAdj.zoom}
+                    onChange={(e) => updateAdj(selectedPhoto, 'zoom', parseFloat(e.target.value))}
+                    className="flex-1 accent-pink-500"
+                  />
+                  <span className="text-[11px] font-mono text-pink-600 w-10">{curAdj.zoom.toFixed(2)}×</span>
+                </div>
+
+                {/* X offset */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-bold text-zinc-500 w-16">↔️ Geser X</span>
+                  <input
+                    type="range"
+                    min="-50"
+                    max="50"
+                    step="1"
+                    value={curAdj.x}
+                    onChange={(e) => updateAdj(selectedPhoto, 'x', parseFloat(e.target.value))}
+                    className="flex-1 accent-sky-500"
+                  />
+                  <span className="text-[11px] font-mono text-sky-600 w-10">{curAdj.x > 0 ? '+' : ''}{curAdj.x}%</span>
+                </div>
+
+                {/* Y offset */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-bold text-zinc-500 w-16">↕️ Geser Y</span>
+                  <input
+                    type="range"
+                    min="-50"
+                    max="50"
+                    step="1"
+                    value={curAdj.y}
+                    onChange={(e) => updateAdj(selectedPhoto, 'y', parseFloat(e.target.value))}
+                    className="flex-1 accent-purple-500"
+                  />
+                  <span className="text-[11px] font-mono text-purple-600 w-10">{curAdj.y > 0 ? '+' : ''}{curAdj.y}%</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => resetAdj(selectedPhoto)}
+                  className="w-full py-1.5 rounded-xl text-[11px] font-bold border-2 border-zinc-200 text-zinc-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition"
+                >
+                  🔄 Reset Pose {selectedPhoto + 1}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Canvas Preview */}
       <div className="bg-sky-50/70 p-4 rounded-2xl border-2 border-dashed border-sky-200 mb-5 flex justify-center items-center shadow-inner overflow-hidden">
         <canvas
           ref={canvasRef}
@@ -597,7 +750,7 @@ export default function StepFinalPhotobox({
         />
       </div>
 
-      {/* Tombol Aksi */}
+      {/* Action Buttons */}
       <div className="space-y-2.5">
         <button
           type="button"
