@@ -2,143 +2,108 @@
 
 export const BANK_SOAL_GOMBAL = [
   {
-    pertanyaan: "Minyak apa yang paling bikin mabuk dan linglung seharian kalau dipandang?",
+    pertanyaan: "Jujur, siapa di antara kita yang paling sering ngambek ga jelas terus tiba-tiba diem?",
     pilihan: [
-      { teks: "Minyaksikan senyum manismu setiap detik 😳💘", benar: true, kabur: false },
-      { teks: "Enggak mau ah, gamau baper 🙈", benar: false, kabur: true }
+      { teks: "Iya aku deh yang suka ngambek, maapin yaa 🥺👉👈", benar: true, kabur: false },
+      { teks: "Kamu lah, ngapain nuduh aku! 🏃💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kipas apa yang paling bikin gelisah dan selalu ditunggu-tunggu {nama}?",
+    pertanyaan: "Kalau lagi laper belum makan, siapa yang mukanya langsung jutek kayak monster?",
     pilihan: [
-      { teks: "Kipastian status hubungan kita berdua 🥺👉👈", benar: true, kabur: false },
-      { teks: "Pura-pura budeg gak denger! 🏃💨", benar: false, kabur: true }
+      { teks: "Akuu, cepetan suapin makan biar ga gigit orang 🦖🍜", benar: true, kabur: false },
+      { teks: "Kamu tuh yang serem banget kayak reog! 🏃‍♀️💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Awan, awan apa yang paling bikin bahagia dan berbunga-bunga di dunia?",
+    pertanyaan: "Siapa yang paling gengsian pas di-chat tapi aslinya salting brutal tiap dipuji?",
     pilihan: [
-      { teks: "Awanna be with you forever and ever! ☁️💖", benar: true, kabur: false },
-      { teks: "Jangan tatap aku nanti salting! 🙈", benar: false, kabur: true }
+      { teks: "Aku dong, aslinya salting guling-guling di kasur 😳💖", benar: true, kabur: false },
+      { teks: "Enak aja, aku selalu cool dan cuek ya! 😎🏃", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kamu tahu gak bedanya {nama} sama modem WiFi di rumah?",
+    pertanyaan: "Coba ngaku, siapa yang sebenernya paling bucin parah dan ga bisa jauh dari {nama}?",
     pilihan: [
-      { teks: "Modem nyambung ke internet, kamu nyambung terus ke hatiku 💖", benar: true, kabur: false },
-      { teks: "Mau nolak gombalan ini wlee 😜", benar: false, kabur: true }
+      { teks: "Jelas aku lah, bucin mampus ke kamu selamanya 💘🙈", benar: true, kabur: false },
+      { teks: "Dih kepedean, kamu yang nempel terus kayak perangko! 😜", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kera apa yang wajib dimusnahkan sekarang juga tanpa ampun?",
+    pertanyaan: "Kalau lagi nonton film berdua, siapa yang sok-sokan melek tapi 10 menit kemudian udah tidur pulas?",
     pilihan: [
-      { teks: "Keraguanmu untuk membuka hati dan jadi pasanganku! 🙈💘", benar: true, kabur: false },
-      { teks: "Lariii kabur dari kenyataan! 🏃💨", benar: false, kabur: true }
+      { teks: "Iya aku yang tepar duluan, peluk dong biar bangun 🥺💤", benar: true, kabur: false },
+      { teks: "Fitnah! Mataku melotot terus nonton kok! 👀🏃", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Jalan apa yang paling mentok dan ga pernah ada ujung keluarnya?",
+    pertanyaan: "Siapa yang paling sering bilang 'terserah mau makan apa' tapi giliran ditawarin ditolak semua?",
     pilihan: [
-      { teks: "Jalan pikiranku yang isinya cuma mikirin kamu terus 🛣️💓", benar: true, kabur: false },
-      { teks: "Belok arah ah gak mau baper! 🏃‍♀️💨", benar: false, kabur: true }
+      { teks: "Hehe akuu, soalnya maunya dimanja dan dipilihin kamu 🙈🍔", benar: true, kabur: false },
+      { teks: "Itu kamu banget ya, jangan lempar batu! 🏃‍♀️💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kucing apa yang paling romantis dan manis di muka bumi?",
+    pertanyaan: "Siapa yang paling kangenan kalau sehari aja ga ada kabar atau ga ketemu?",
     pilihan: [
-      { teks: "Kucing-ta padamu tulus dari lubuk hatiku 🐱❤️", benar: true, kabur: false },
-      { teks: "Kucingnya ngibrit kabur! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku lah, rasanya hampa banget seharian gaada kamu 🥺💔", benar: true, kabur: false },
+      { teks: "Gak kangen tuh, biasa aja wleee 😜🏃", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Rumah sakit apa yang paling bikin betah dan ga bakal mau pulang?",
+    pertanyaan: "Kalau lagi jalan bareng, siapa yang jalannya suka bengong hampir nabrak tiang?",
     pilihan: [
-      { teks: "Rumah tangga bahagia kita berdua di masa depan 🏡💍", benar: true, kabur: false },
-      { teks: "Takut disuntik mau kabur! 🙈", benar: false, kabur: true }
+      { teks: "Aku, soalnya mataku sibuk mandang senyum manismu terus 😍✨", benar: true, kabur: false },
+      { teks: "Ngarang, aku jalannya lurus fokus ya! 🏃💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Tarzan apa yang bikin deg-degan setengah mati pas ketemu?",
+    pertanyaan: "Siapa yang paling sering overthinking hal kecil tapi langsung sembuh pas dielus kepalanya?",
     pilihan: [
-      { teks: "Tarzan-jung liat paras manis dan senyummu hari ini 🍃😍", benar: true, kabur: false },
-      { teks: "Gantungan di pohon lariii! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku si overthinking, sini elus kepala aku sekarang 🥺💆", benar: true, kabur: false },
+      { teks: "Aku mah santai orangnya, kamu yang panikan! 🏃‍♀️💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Mandi apa yang sama sekali gak bikin badan basah kuyup?",
+    pertanyaan: "Siapa yang kalau kirim pap atau foto aib paling banyak di chat?",
     pilihan: [
-      { teks: "Mandirikan rumah tangga harmonis bersamamu 🥰", benar: true, kabur: false },
-      { teks: "Dingin woy mau lari! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku, tapi kan demi bikin kamu ketawa bahagia 🤪💖", benar: true, kabur: false },
+      { teks: "Aib kamu tuh numpuk di galeri aku wlee! 🏃💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kopi apa yang paling manis di dunia ngalahin sepabrik gula?",
+    pertanyaan: "Siapa yang diem-diem paling cemburuan kalau pasangannya dilirik atau diajak ngobrol orang lain?",
     pilihan: [
-      { teks: "Kopi-kiran kamu tiap detik tiap menit tanpa henti ☕💓", benar: true, kabur: false },
-      { teks: "Kopinya tumpah kabur ah! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku cemburu berat, soalnya kamu punya aku seutuhnya! 😤🔒", benar: true, kabur: false },
+      { teks: "Ga cemburu tuh biasa aja (padahal hati mendidih) 🏃‍♀️💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Nasi apa yang paling berkah dan bikin bahagia dunia akhirat?",
+    pertanyaan: "Kalau lagi capek atau gak enak badan, siapa yang manjanya langsung naik 1000%?",
     pilihan: [
-      { teks: "Nasi uduk berdua di pelaminan sama kamu 🍚👰", benar: true, kabur: false },
-      { teks: "Kenyang makan gombalan wleee 😜", benar: false, kabur: true }
+      { teks: "Aku maunya dimanja kamu 24 jam gamau lepas 🧸🍼", benar: true, kabur: false },
+      { teks: "Aku mandiri kuat ya, kamu yang manja! 🏃💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Kotak apa yang paling menyakitkan kalau sampai hilang dari hidup?",
+    pertanyaan: "Siapa yang paling sering scrolling galeri foto berdua sambil senyum-senyum sendiri?",
     pilihan: [
-      { teks: "Kotak-kan pernah bisa hidup bahagia tanpa senyumanmu 📦💔", benar: true, kabur: false },
-      { teks: "Kotaknya dicuri kabur! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku sering senyum sendiri liat momen manis kita berdua 🥰📸", benar: true, kabur: false },
+      { teks: "Gak pernah liat tuh, sibuk nge-game wleee 😜🏃", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Cecak apa yang bikin jantung {nama} berdebar kencang tak beraturan?",
+    pertanyaan: "Siapa yang paling boros jajan boba / kopi tapi tetep minta traktir?",
     pilihan: [
-      { teks: "Cecak-ep kamu pas lagi senyum manis gini! 🦎✨", benar: true, kabur: false },
-      { teks: "Hiii geli mau kabur! 🙈", benar: false, kabur: true }
+      { teks: "Akuu, traktir dong ayang yang baik hati sedunia 🥺🧋", benar: true, kabur: false },
+      { teks: "Kamu tuh yang hobi jajan melulu! 🏃💨", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "Bolu apa yang paling istimewa dan langka di semesta raya?",
+    pertanyaan: "Terakhir, siapa yang paling beruntung di dunia ini karena bisa dapetin pasangan selucu kamu?",
     pilihan: [
-      { teks: "Bolu-kan hatiku sudah kau curi seutuhnya 🍰💞", benar: true, kabur: false },
-      { teks: "Kuenya habis gak bisa diklik! 🏃💨", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "Bis apa yang bikin baper dan salting brutal tiap detik?",
-    pilihan: [
-      { teks: "Bisa-bisanya kamu secantik dan semanis ini tiap detik? 🚌😳", benar: true, kabur: false },
-      { teks: "Ketinggalan bis mau kabur! 🏃💨", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "Setan apa yang paling bikin berbunga-bunga dan ga ada serem-seremnya?",
-    pilihan: [
-      { teks: "Setangkai bunga mawar dan seluruh hatiku untukmu 🌹💖", benar: true, kabur: false },
-      { teks: "Takut setan kaburr! 👻🏃", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "Cuka apa yang paling manis sedunia ngalahin madu?",
-    pilihan: [
-      { teks: "Cuka (suka) banget sama kamu dari dulu sampai selamanya! 🍯💕", benar: true, kabur: false },
-      { teks: "Kecut banget mau lari! 🏃💨", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "Semen apa yang paling kuat merekatkan dua insan?",
-    pilihan: [
-      { teks: "Semen-jak aku mengenalmu, duniaku jadi penuh warna indah 🏰💞", benar: true, kabur: false },
-      { teks: "Keras kayak batu kabur! 🏃💨", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "Rel apa yang paling bikin bahagia kalau dilewati berdua?",
-    pilihan: [
-      { teks: "Rela menemanimu berdua sampai kakek nenek nanti 🚂👵👴", benar: true, kabur: false },
-      { teks: "Keretanya lewat mau lari! 🏃💨", benar: false, kabur: true }
+      { teks: "Aku orang paling beruntung di semesta raya punya kamu 💐💍💖", benar: true, kabur: false },
+      { teks: "Dua-duanya rugi wkwk kaburrr ah! 🏃💨", benar: false, kabur: true }
     ]
   }
 ];

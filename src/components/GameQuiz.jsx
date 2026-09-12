@@ -7,12 +7,12 @@ import { BANK_SOAL_GOMBAL } from '@/lib/constants';
 const TOTAL_SOAL = 5;
 
 const RUNAWAY_MESSAGES = [
-  'Mau nolak ya? Gak bisa! 😜',
-  'Dilarang nolak cinta! 💖',
-  'Harus pilih yang gombal! 🙈',
-  'Eits kabur! Wleee 🏃💨',
-  'Gak bisa lolos dari aku! 💘',
-  'Klik yang satunya dong! 🥺👉👈',
+  'Gamau ngaku ya? Wleee 😜',
+  'Eits jangan nuduh aku dong! 🏃💨',
+  'Gak bisa lolos, ngaku aja cepetan! 🙈',
+  'Dilarang ngelak dari kenyataan! 💖',
+  'Tombol ini menolak difitnah! 🏃‍♀️💨',
+  'Klik yang ngaku dong, jangan gengsi! 🥺👉👈',
 ];
 
 export default function GameQuiz({ namaUser, onNext }) {
