@@ -1,0 +1,3 @@
+# Ignore local development server and IDE settings
+server.js
+.vscode
