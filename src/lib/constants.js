@@ -7,67 +7,49 @@ export const BANK_SOAL_GOMBAL = [
       { teks: "iya aku deh maapin ya 🥺", benar: true, kabur: false },
       { teks: "kamu lah", benar: false, kabur: true }
     ]
+
   },
   {
-    pertanyaan: "siapa yang sering bilang terserah tapi pas diajak gamau?",
+    pertanyaan: "siapa yang paling suka jajan ",
     pilihan: [
-      { teks: "aku hehe maap ya 🙈", benar: true, kabur: false },
-      { teks: "kamu tuh", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "siapa yang paling bucin di antara kita?",
-    pilihan: [
-      { teks: "aku banget parah 💕", benar: true, kabur: false },
+      { teks: "aku banget parah", benar: true, kabur: false },
       { teks: "kamu lah ya kali aku", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "siapa yang kalau laper mukanya langsung jutek?",
+    pertanyaan: "siapa yang kalo makan mintanya di suapin mulu",
     pilihan: [
-      { teks: "aku, cepet suapin dong 🍜", benar: true, kabur: false },
+      { teks: "aku, cepet suapin dong", benar: true, kabur: false },
       { teks: "kamu lah enak aja", benar: false, kabur: true }
     ]
   },
   {
     pertanyaan: "siapa yang paling kangenan kalau sehari ga ketemu?",
     pilihan: [
-      { teks: "aku kangen terus sama kamu 🥺", benar: true, kabur: false },
+      { teks: "aku kangen terus sama kamu", benar: true, kabur: false },
       { teks: "kamu, aku biasa aja tuh", benar: false, kabur: true }
     ]
+
+
   },
   {
-    pertanyaan: "siapa yang kalau dichat sok cuek padahal aslinya nungguin?",
+    pertanyaan: "siapa yang paling cemburuan?",
     pilihan: [
-      { teks: "aku ngaku deh hehe 😳", benar: true, kabur: false },
-      { teks: "dih kamu kali", benar: false, kabur: true }
+      { teks: "oh jelas aku lah", benar: true, kabur: false },
+      { teks: "kamu benget banget banget sih", benar: false, kabur: true }
     ]
   },
   {
-    pertanyaan: "siapa yang tidurnya paling kebo susah dibangunin?",
+    pertanyaan: "siapa yang kalo di ajak makan susah",
     pilihan: [
-      { teks: "aku wkwk 🥱", benar: true, kabur: false },
-      { teks: "kamu yang kebo", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "siapa yang paling cemburuan kalau ada yang ngeliatin?",
-    pilihan: [
-      { teks: "aku, kamu kan punyaku 😤", benar: true, kabur: false },
-      { teks: "kamu yang parah", benar: false, kabur: true }
-    ]
-  },
-  {
-    pertanyaan: "siapa yang kalau jalan suka ga liat jalanan?",
-    pilihan: [
-      { teks: "aku, kan liatin kamu terus 😍", benar: true, kabur: false },
-      { teks: "kamu yang nabrak-nabrak", benar: false, kabur: true }
+      { teks: "kali ini aku deh", benar: true, kabur: false },
+      { teks: "kamu lah susah banget", benar: false, kabur: true }
     ]
   },
   {
     pertanyaan: "siapa yang paling beruntung dapet pasangan sebaik ini?",
     pilihan: [
-      { teks: "aku yang paling beruntung 🥰", benar: true, kabur: false },
+      { teks: "aku lah siapa lagi", benar: true, kabur: false },
       { teks: "kamu lah beruntung dapet aku", benar: false, kabur: true }
     ]
   }
